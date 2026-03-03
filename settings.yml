@@ -36,7 +36,7 @@ use_osrf_tarball: false
 opensrf_as_service: true #Do you want to install OpenSRF as a service?
 #----------
 
-#These setup the Dojo installation. They are only needed if you're NOT installing from a tarball.  
+#These setup the Dojo installation. They are only needed if you're NOT installing from an Evergreen tarball.  
 
 dojo_version: 1.3.3
 dojo_package: "dojo-release-{{dojo_version}}.tar.gz"
