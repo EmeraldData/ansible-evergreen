@@ -20,7 +20,7 @@ Services can be selectively enabled or skipped using variables defined in `setti
 
 - Automated Evergreen environment deployment
 - Modular service installation (skip any component)
-- Fully configurable via `settings.yml`
+- Fully configurable via `settings.yml`; the `settings.yml` file is commented to help walk you through
 - Designed for Ubuntu systems
 - Idempotent Ansible-based deployment
 - GNU licensed
@@ -40,5 +40,6 @@ Services can be selectively enabled or skipped using variables defined in `setti
 ```bash
 git clone https://github.com/EmeraldData/ansible-evergreen.git
 cd ansible-evergreen
+
 
 
