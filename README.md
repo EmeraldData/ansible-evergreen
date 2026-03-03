@@ -12,7 +12,7 @@ This playbook has the ability to install and configure:
 - Evergreen
 - All required system prerequisites
 
-Services can be selectively enabled or skipped using variables defined in `settings.yml`.
+Services can be selectively installed or skipped using variables defined in `settings.yml`.
 
 ---
 
@@ -40,6 +40,7 @@ Services can be selectively enabled or skipped using variables defined in `setti
 ```bash
 git clone https://github.com/EmeraldData/ansible-evergreen.git
 cd ansible-evergreen
+
 
 
 
