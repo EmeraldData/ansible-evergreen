@@ -1,6 +1,6 @@
 - name: Install OpenSRF
   hosts: prod_hosts
-  connection: ssh
+  connection: local
   become: true
   become_method: sudo
   vars_files:
@@ -47,7 +47,6 @@
       when: install_db|bool
     - name: Configure redis
       include_tasks: redis/redis.yml
-      tags: redis
       when: setup_redis|bool
     - name: Set passwords
       include_tasks: utilities/set_passwords.yml
