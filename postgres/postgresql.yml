@@ -1,9 +1,7 @@
 - name: Install postgresql
-  become: true
   shell: "make -f {{eg_local}}/Open-ILS/src/extras/Makefile.install postgres-server-{{os_version}}-{{pg_version}}"
   when: install_postgres|bool
 - name: Install Evergreen DB
-  become: true
   shell:
     cmd: "perl Open-ILS/src/support-scripts/eg_db_config --service all {% if overwrite_config_files|bool %}--update-config {% endif %}{%if install_db|bool%}--create-database --create-schema {% endif %}{%if create_offline|bool%}--create-offline {%endif %} --user {{db_user}} --password {{db_pass}} --hostname {{db_hostname}} --port {{db_port}} --database {{db_name}} {%if overwrite_config_files|bool%}--admin-user {{admin_user}} --admin-pass {{admin_pass}}{%endif%}{%if load_conerto|bool%}--load-all-sample {%endif%}{%if load_concerto_enhanced%}--load-conerto-enhanced {%endif%}"
     chdir: "{{oils_install_path}}"
