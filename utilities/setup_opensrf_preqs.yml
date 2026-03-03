@@ -1,11 +1,9 @@
 - name: Check that make is installed
-  become: true
   apt:
     name: make
     state: present
     update: cache
 - name: Create opensrf user
-  become: true
   user:
     name: opensrf
     shell: /bin/bash
@@ -16,7 +14,6 @@
     path: "{{base_dir}}"/.bashrc
   register: file_status
 - name: Export "{{oils_install_path}}"/bin to .bashrc PATH for "{{oils_user}}" user for new installations
-  become: true
   become_user: opensrf
   lineinfile: 
     dest: /home/opensrf/.bashrc
@@ -28,6 +25,5 @@
     line: "export PATH='{{oils_install_path}}/bin:$PATH'"
   when: not file_status.stat.exists
 - name: Create opensrf.conf in /etc/ld.so.conf if missing
-  become: true
   shell: "echo {{oils_install_path}}/lib > /etc/ld.so.conf.d/opensrf.conf"
 
