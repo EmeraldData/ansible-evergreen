@@ -9,7 +9,7 @@
 - name: Stop apache2
   systemd: name=apache2 state=stopped
 - name: Copy apache conf files
-  shell: "cp {{eg_local}}/Open-ILS/examples/apache_24/eg_34.conf /etc/apache2/sites/available/eg.conf && cp {{eg_local}}/Open-ILS/examples/apache_24/eg_vhost_24.conf /etc/apache2/eg_vhost.conf && cp {{eg_local}}/Open-ILS/examples/apache_24/eg_startup /etc/apache2/"
+  shell: "cp {{eg_local}}/Open-ILS/examples/apache_24/eg_24.conf /etc/apache2/sites/available/eg.conf && cp {{eg_local}}/Open-ILS/examples/apache_24/eg_vhost_24.conf /etc/apache2/eg_vhost.conf && cp {{eg_local}}/Open-ILS/examples/apache_24/eg_startup /etc/apache2/"
 - name: Create SSL directory
   file: path=/etc/apache2/ssl state=directory
 - name: Create SSL certs
