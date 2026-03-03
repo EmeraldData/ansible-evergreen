@@ -10,7 +10,7 @@ osrf_websocket_port: 443
 install_eg: true #Do you want to run the Evergreen installer?
 install_osrf: true #Do you want to run the OpenSRF installer?
 overwrite_config_files: true #If you don't want to overwrite existing configuration files, set this to false. If true, then the playbook will create backups automatically.
-unmount_disks: false #If you're running a cluster environment, you likely have mounts that will cause delays/failures in changing ownership in {{oils_install_path}}. Set the disks that you want to unmount before doing so in 'mounts.yml'. The playbook will remount them when finished.
+unmount_disks: false #If you're running a cluster environment, you likely have mounts that will cause delays/failures in changing ownership in {{oils_install_path}}. Set the disks that you want to unmount before doing so in 'inventory.yml'. The playbook will remount them when finished.
 #----------
 
 #These setup which Evergreen version you want to install or upgrade to; the playbook will use a tarball where {{use_eg_tarball}} is set to true, otherwise it will use the git repo. The playbook will set the home installation directory accordingly. 
