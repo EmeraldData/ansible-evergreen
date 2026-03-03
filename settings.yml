@@ -43,7 +43,7 @@ dojo_package: "dojo-release-{{dojo_version}}.tar.gz"
 dojo_url: "https://download.dojotoolkit.org/release-{{dojo_version}}/{{dojo_package}}"
 #----------
 
-#For a new environment, where apache and nginx haven't been installed, set setup_apache 
+#For a new environment, where apache and nginx haven't been installed, set {{setup_apache}} and {{setup_nginx}} to 'true' 
 
 setup_apache: false
 apache_service_name: apache #Value is 'apache' for most Linux variants, but if using RedHat, you likely need to set to 'httpd'
