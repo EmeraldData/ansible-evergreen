@@ -1,0 +1,84 @@
+---
+#Basic settings for your installation
+new_install: false #Is this a new installation or upgrade? If it's just an upgrade, mark this as false.
+base_dir: /home/opensrf #Where the installation files will be downloaded to and .bashrc and .srfsh.xml files will live
+oils_install_path: /openils #Where Evergreen lives on the server
+oils_user: opensrf
+os_version: ubuntu-jammy
+osrf_websocket_port: 443 
+
+install_eg: true #Do you want to run the Evergreen installer?
+install_osrf: true #Do you want to run the OpenSRF installer?
+overwrite_config_files: true #If you don't want to overwrite existing configuration files, set this to false. If true, then the playbook will create backups automatically.
+unmount_disks: false #If you're running a cluster environment, you likely have mounts that will cause delays/failures in changing ownership in {{oils_install_path}}. Set the disks that you want to unmount before doing so in 'mounts.yml'. The playbook will remount them when finished.
+#----------
+
+#These setup which Evergreen version you want to install or upgrade to; the playbook will use a tarball where {{use_eg_tarball}} is set to true, otherwise it will use the git repo. The playbook will set the home installation directory accordingly. 
+
+eg_local: "{{base_dir}}/Evergreen"
+eg_version: 3.16.4
+eg_tarball: Evergreen-ILS-{{eg_version}}.tar.gz
+eg_tarball_url: https://evergreen-ils.org/downloads/{{eg_tarball}}
+git_eg_branch: main
+git_eg_repo: git://git.evergreen-ils.org/Evergreen.git
+use_eg_tarball: true
+#----------
+
+#These setup which OpenSRF version you want to install or upgrade to; the playbook will use a tarball where {{use_osrf_tarball}} is set to true, otherwise it will use the git repo. The playbook will set the home installation directory accordingly.
+
+opensrf_local: "{{base_dir}}/OpenSRF"
+opensrf_version: 3.3.2
+opensrf_tarball: opensrf-{{opensrf_version}}.tar.gz 
+opensrf_tarball_url: https://evergreen-ils.org/downloads/{{opensrf_tarball}}
+git_opensrf_branch: main  
+git_opensrf_repo: git://git.evergreen-ils.org/OpenSRF.git
+use_osrf_tarball: false
+opensrf_as_service: true #Do you want to install OpenSRF as a service?
+#----------
+
+#These setup the Dojo installation. They are only needed if you're NOT installing from a tarball.  
+
+dojo_version: 1.3.3
+dojo_package: "dojo-release-{{dojo_version}}.tar.gz"
+dojo_url: "https://download.dojotoolkit.org/release-{{dojo_version}}/{{dojo_package}}"
+#----------
+
+#For a new environment, where apache and nginx haven't been installed, set setup_apache 
+
+setup_apache: false
+apache_service_name: apache #Value is 'apache' for most Linux variants, but if using RedHat, you likely need to set to 'httpd'
+create_ssl_certs: false
+
+setup_nginx: false
+#----------
+
+#For new installations, these set the variables for the database setup.
+
+install_postgres: false #Do you need postgresql installed? If so, set to 'true'.
+pg_version: 15
+
+install_db: false
+db_hostname: localhost
+db_port: 5432
+db_name: evergreen
+db_user: evergreen
+admin_user: admin
+create_offline: false
+load_concerto: false
+load_concerto_enhanced: false
+#----------
+
+#Redis setup. If set to 'true', the playbook will handle everything. If {{overwrite_config_files}} is set to false, you'll need to manually change the password values for the 'opensrf', 'gateway', and 'router' users in {{oils_install_path}}/conf/opensrf_conf.xml, as well as the {{oils_user}} password in {{base_dir}}/.srfsh.xml
+
+setup_redis: true
+#----------
+
+#Sets up websocketd as service.
+
+setup_websocketd: false
+websocketd_as_service: true
+websocketd_dir: /usr/local/bin/websocketd
+websocketd_version: 0.4.1
+websocketd_package: websocketd-{{websocketd_version}}-linux_amd64.zip
+websocketd_download_url: https://github.com/joewalnes/websocketd/releases/download/v{{websocketd_version}}/{{websocketd_package}}
+#----------

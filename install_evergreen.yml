@@ -1,0 +1,54 @@
+- name: Install OpenSRF
+  hosts: prod_hosts
+  connection: ssh
+  become: true
+  become_method: sudo
+  vars_files:
+    - passwords.yml
+    - settings.yml
+    - mounts.yml
+  tasks:
+    - name: Confirm passwords present
+      include_tasks: utilities/confirm_vaulted_pws.yml
+    - name: Setup OpenSRF prereqs
+      include_tasks: utilities/setup_opensrf_preqs.yml
+      when: new_install|bool
+    - name: Pull latest OpenSRF code
+      include_tasks: opensrf/update_opensrf_repo.yml
+      when: install_osrf|bool
+    - name: Install OpenSRF
+      include_tasks: opensrf/opensrf.yml
+      when: install_osrf|bool
+    - name: Install websocketd
+      include_tasks: websocketd/websocketd.yml
+      when: setup_websocketd|bool
+- name: Install Evergreen
+  hosts: prod_hosts
+  connection: local
+  become_method: sudo
+  vars_files:
+    - settings.yml
+    - passwords.yml #Vaulted password file
+  tasks:
+    - name: Pull Evergreen code
+      include_tasks: evergreen/update_eg_repo.yml
+      when: install_eg|bool
+    - name: Perform make on Makefile
+      include_tasks: evergreen/evergreen.yml
+      when: install_eg|bool
+    - name: Setup Apache
+      include_tasks: apache2/apache.yml
+      when: setup_apache|bool
+    - name: Setup nginx
+      include_tasks: nginx/nginx.yml
+      when: setup_nginx|bool
+    - name: Install postgresql
+      include_tasks: postgres/postgresql.yml
+      when: install_db|bool
+    - name: Configure redis
+      include_tasks: redis/redis.yml
+      tags: redis
+      when: setup_redis|bool
+    - name: Set passwords
+      include_tasks: utilities/set_passwords.yml
+      when: overwrite_config_files|bool

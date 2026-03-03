@@ -1,0 +1,26 @@
+- name: Pull latest OpenSRF git
+  become: true
+  become_user: '{{oils_user}}'
+  when: not use_osrf_tarball|bool
+  git:
+    repo: '{{git_opensrf_repo}}'
+    dest: '{{opensrf_local}}'
+    clone: yes
+    update: yes
+- name: Pull latest OpenSRF tarball
+  become: true
+  become_user: '{{oils_user}}'
+  when: use_osrf_tarball|bool
+  shell:
+    cmd: wget '{{osrf_tarball_url}}'
+    chdir: '{{base_dir}}'
+- name: Update install directory
+  when: use_osrf_tarball|bool
+  set_fact:
+    opensrf_local: "{{base_dir}}/opensrf-{{opensrf_version}}"
+- name: Update OpenSRF repo and checkout branch
+  become: true
+  become_user: '{{oils_user}}'
+  when: not use_osrf_tarball|bool
+  shell:
+    cmd: "cd {{opensrf_local}} && git checkout {{git_opensrf_branch}} && git pull"

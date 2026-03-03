@@ -1,0 +1,33 @@
+- name: Install nginx
+  become: true
+  package:
+    name: nginx
+    state: present
+- name: Enable nginx
+  service:
+    name: nginx
+    enabled: true
+- name: Stop nginx
+  become: true
+  systemd: name=nginx state=stopped
+- name: Remove preexisting symbolic link
+  become: true
+  shell: "rm /etc/nginx/sites-enabled/osrf-ws-http-proxy"
+- name: Copy nginx conf files
+  become: true
+  shell: "cp {{opensrf_local}}/examples/nginx/osrf-ws-http-proxy /etc/nginx/sites-available/ && ln -s /etc/nginx/sites-available/osrf-ws-http-proxy /etc/nginx/sites-enabled/osrf-ws-http-proxy"
+- name: Check for default site conf
+  become: true
+  stat:
+    path: /etc/nginx/sites-enabled/default
+  register: file_status
+- name: Remove default site
+  become: true
+  shell: "rm /etc/nginx/sites-enabled/default"
+  when: file_status.stat.exists
+- name: Create SSL directory
+  become: true
+  file: path=/etc/apache2/ssl state=directory
+- name: Generate dhparam file
+  become: true
+  shell: "openssl dhparam -out /etc/apache2/ssl/dhparam.pem 2048"

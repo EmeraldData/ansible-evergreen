@@ -1,0 +1,9 @@
+- name: Confirm that password fields have been set
+  pause:
+    prompt: "Based on your configuration in settings.yml, this playbook requires you to have respective 'db_pass' (for 'db_user') and 'admin_pass' (for 'admin_user') set in a vaulted file. Have you set those? Type Y to continue"
+  register: confirm
+  when: overwrite_config_files|bool 
+- name: Continuing or quitting, pending answer 
+  fail:
+    msg: "Aborted by user"
+  when: confirm.user_input != 'Y' and confirm.user_input != 'y' and overwrite_config_files|bool

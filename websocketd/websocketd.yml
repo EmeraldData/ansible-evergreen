@@ -1,0 +1,31 @@
+- name: Check if websocketd is running
+  become: true
+  shell: "ps aux | grep /usr/local/bin/websocketd"
+  register: websocketd_running
+- name: Stop websocketd
+  become: true
+  shell: "pkill -f '/usr/local/bin/websocketd'"
+  ignore_errors: true
+  when: (websocketd_running | regex_search("/usr/local/bin/websocketd --loglevel")) 
+- name: Download websocketd
+  shell: cd /tmp/ && wget --quiet '{{websocketd_download_url}}'
+- name: Unpack websocketd
+  unarchive:
+    src: /tmp/{{websocketd_package}}
+    dest: /tmp/
+    remote_src: yes
+- name: Install websocketd
+  become: true
+  shell: cp /tmp/websocketd /usr/local/bin
+- name: Getting services information
+  become: true
+  service_facts:
+  register: service_state
+  when: websocketd_as_service|bool
+- name: Checking if websocketd-osrf exists as a service
+  set_fact:
+    websocketd_exists: "{{'websocketd-osrf.service' in ansible_facts.services}}"
+- name: Creating websocketd as a service
+  become: true
+  shell: "cp {{oils_install_path}}/examples/websocketd-osrf.service /lib/systemd/system/websocketd-osrf.service && systemctl daemon-reload && systemctl enable websocketd-osrf"
+  when: not websocketd_exists|bool and websocketd_as_service 

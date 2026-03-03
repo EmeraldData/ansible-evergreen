@@ -1,0 +1,3 @@
+- name: Get timestamp to append config file backups
+  set_fact:
+    file_timestamp: "{{lookup('pipe', 'date +%Y%m%d.%H.%M')}}"

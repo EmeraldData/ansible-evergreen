@@ -1,0 +1,72 @@
+- name: Install apache2
+  become: true
+  package:
+    name: "{{apache_service_name}}"
+    state: present
+- name: Enable apache2
+  service:
+    name: "{{apache_service_name}}"
+    enabled: true
+- name: Stop apache2
+  become: true
+  systemd: name=apache2 state=stopped
+- name: Copy apache conf files
+  become: true
+  shell: "cp {{eg_local}}/Open-ILS/examples/apache_24/eg_34.conf /etc/apache2/sites/available/eg.conf && cp {{eg_local}}/Open-ILS/examples/apache_24/eg_vhost_24.conf /etc/apache2/eg_vhost.conf && cp {{eg_local}}/Open-ILS/examples/apache_24/eg_startup /etc/apache2/"
+- name: Create SSL directory
+  become: true
+  file: path=/etc/apache2/ssl state=directory
+- name: Create SSL certs
+  become: true
+  shell: cd /etc/apache2/ssl && openssl req -new -x509 -days 365 -nodes -out server.crt -keyout server.key
+  when: create_ssl_certs|bool
+- name: Disable mpm_event
+  become: true
+  shell: /usr/sbin/a2dismod mpm_event
+- name: Enable mpm_prefork
+  become: true
+  shell: /usr/sbin/a2enmod mpm_prefork
+- name: Enable apache mod expires
+  become: true
+  shell: /usr/sbin/a2enmod expires
+- name: Enable apache mod rewrite
+  become: true
+  shell: /usr/sbin/a2enmod rewrite
+- name: Enable apache remoteip
+  become: true
+  shell: /usr/sbin/a2enmod remoteip
+- name: Configure apache remoteip
+  become: true
+  replace:
+    dest: /etc/apache2/eg_vhost.conf
+    regexp: '^#RemoteIP'
+    replace: 'RemoteIP'
+- name: Disable default site
+  become: true
+  shell: /usr/sbin/a2dissite 000-default
+- name: Enable eg.conf
+  become: true
+  shell: /usr/sbin/a2ensite eg.conf
+- name: Change ownership of /var/lock/apache2
+  become: true
+  file: path=/var/lock/apache2 owner=opensrf group=opensrf
+- name: Change run-user to opensrf
+  become: true
+  replace:
+    dest: /etc/apache2/envvars
+    regexp: 'www-data'
+    replace: 'opensrf'
+- name: Set KeepAliveTimeout
+  become: true
+  replace:
+    dest: /etc/apache2/apache2.conf
+    regexp: 'KeepAliveTimeout .*'
+    replace: 'KeepAliveTimeout 1'
+- name: Create mpm_preform.conf
+  become: true
+  template:
+    src: mpm_prefork.js2
+    dest: /etc/apache2/mods-available/mpm_prefork.conf
+    owner: root
+    group: root
+    mode: "0644"

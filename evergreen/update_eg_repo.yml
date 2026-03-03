@@ -1,0 +1,32 @@
+- name: Pull latest Evergreen git
+  become: true
+  become_user: '{{oils_user}}'
+  when: not use_eg_tarball|bool
+  git:
+    repo: '{{git_eg_repo}}'
+    dest: '{{git_eg_local}}'
+    clone: yes
+    update: yes
+- name: Pull latest Evergreen tarball
+  become: true
+  become_user: '{{oils_user}}'
+  when: use_eg_tarball|bool
+  shell:
+    cmd: wget '{{eg_tarball_url}}'
+    chdir: '{{base_dir}}'
+- name: Extract code from tarball
+  become: true
+  become_user: '{{oils_user}}'
+  when: use_eg_tarball|bool
+  shell:
+    cmd: cd '{{base_dir}}' && tar xzf '{{eg_tarball}}'
+- name: Update install directory
+  when: use_eg_tarball|bool
+  set_fact:
+    eg_local: "{{base_dir}}/Evergreen-ILS-{{eg_version}}"
+- name: Update Evergreen repo and checkout branch
+  become: true
+  become_user: '{{oils_user}}'
+  when: not use_eg_tarball|bool
+  shell:
+    cmd: git checkout '{{git_eg_branch}}' && git pull

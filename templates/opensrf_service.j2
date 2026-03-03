@@ -1,0 +1,23 @@
+[Unit]
+Description=Open Service Request Framework
+After=redis.service memcached.service
+Before=apache2.service
+#Requries=memcached.service
+BindsTo=redis.service
+
+[Service]
+User=opensrf
+Group=opensrf
+Type=oneshot
+RemainAfterExit=yes
+Environment=PATH=/openils/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStartPre=/bin/sleep 5
+ExecStart=/openils/bin/osrf_control --localhost --start-all
+#ExecStartPost=/bin/sleep 5
+#ExecStartPost=/usr/bin/sudo /bin/systemctl -q restart apache2.service
+#ExecStartPost=/usr/bin/sudo /bin/systemctl -q restart apache2-ws.service
+ExecStop=/openils/bin/osrf_control --localhost --stop-all
+
+[Install]
+WantedBy=multi-user.target
+Alias=opensrf.service

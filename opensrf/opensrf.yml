@@ -1,0 +1,62 @@
+- name: Peform make on new OpenSRF version
+  shell:
+    cmd: make -f src/extras/Makefile.install {{os_version}}
+    chdir: "{{opensrf_local}}"
+- name: Run autoreconf
+  shell:
+    cmd: autoreconf -i
+    chdir: "{{opensrf_local}}"
+- name: Configure & Make OpenSRF
+  shell:
+    cmd: "./configure --prefix=/openils --sysconfdir={{oils_install_path}}/conf --with-websockets-port={{osrf_websocket_port}} && make"
+    chdir: "{{opensrf_local}}"
+- name: Make install
+  shell:
+    cmd: make install
+    chdir: "{{opensrf_local}}"
+- name: Change ownership of "{{oils_install_path}}" to "{{oils_user}}"
+  include_tasks: utilities/set_opensrf_owner.yml
+- name: Check if redis-accounts.txt.example exists
+  stat:
+    path: "{{oils_install_path}}/conf/redis-accounts.txt.example"
+  register: file_check
+- name: Check if redis-accounts.txt exists
+  stat:
+    path: "{{oils_install_path}}/conf/redis-accounts.txt"
+  register: file_check
+- name: Backup redis-accounts.txt
+  copy:
+    src: "{{oils_install_path}}/conf/redis-accounts.txt"
+    dest: "{{oils_install_path}}/conf/redis-accounts.txt.{{file_timestamp}}"
+    owner: "{{oils_user}}"
+    group: "{{oils_user}}"
+    mode: "0644"
+  when: file_check.stat.exists
+- name: Check if redis-accounts.txt.example exists
+  stat:
+    path: "{{oils_install_path}}/conf/redis-accounts.txt.example"
+  register: file_check
+- name: Copy redis-accounts.txt.example to redis-accounts.txt
+  copy:
+    src: "{{oils_install_path}}/conf/redis-accounts.txt.example"
+    dest: "{{oils_install_path}}/conf/redis-accounts.txt"
+    owner: "{{oils_user}}"
+    group: "{{oils_user}}"
+    mode: "0644"
+  when: file_check.stat.exists
+- name: Get service facts
+  service_facts:
+- name: Check if OpenSrf exists as a service
+  set_fact:
+    opensrf_exists: ansible_facts.services["opensrf.service"] is defined
+- name: Install OpenSRF as a service
+  template:
+    src: opensrf_service.j2
+    dest: "/usr/lib/systemd/system/opensrf.service"
+    owner: root
+    group: root
+  when: not opensrf_exists|bool
+- name: Enable OpenSRF as a service
+  shell: "systemctl daemon-reload && systemctl enable opensrf"
+- name: Run ldconfig
+  shell: "ldconfig"

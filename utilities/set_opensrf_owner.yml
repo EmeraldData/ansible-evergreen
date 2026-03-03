@@ -1,0 +1,12 @@
+- name: Unmount remote disks before changing ownership to avoid delays/errors
+  become_user: root
+  shell: "umount {{item.name}}"
+  loop: "{{mounts}}"
+  when: unmount_disks|bool and mounts | length > 0  
+- name: Set "{{oils_install_path}}" owner to "{{oils_user}}"
+  become_user: root
+  shell: "chown -R {{oils_user}}:{{oils_user}} {{oils_install_path}}"
+- name: Remount remote disks
+  become_user: root
+  shell: "mount -a"
+  when: unmount_disks|bool

@@ -1,0 +1,67 @@
+- name: Install Makefile
+  shell:
+    cmd: make -f Open-ILS/src/extras/Makefile.install '{{os_version}}'
+    chdir: '{{eg_local}}'
+- name: Install Makefile developer
+  shell:
+    cmd: make -f Open-ILS/src/extras/Makefile.install '{{os-version}}'-developer
+    chdir: '{{eg_local}}'
+  when: not use_eg_tarball|bool
+- name: Update AngularJS Node packages
+  shell:
+    cmd: npm ci
+    chdir: "{{eg_local}}/Open-ILS/web/js/ui/default/staff"
+  when: not use_eg_tarball|bool
+- name: Run AngularJS Node build script
+  shell:
+    cmd: npm run build-prod
+    chdir: "{{eg_local}}/Open-ILS/web/js/ui/default/staff"
+  when: not use_eg_tarball|bool
+- name: Install Angular Dependencies
+  shell:
+    cmd: npm ci
+    chdir: "{{eg_local}}/Open-ILS/src/eg2"
+  when: not use_eg_tarball|bool
+- name: Run Angular build script
+  shell:
+    cmd: ng build --configuration=production
+    chdir: "{{eg_loca}}/Open-ILS/src/eg2"
+  when: not use_eg_tarball|bool
+- name: Run ./configure
+  shell:
+    cmd: "PATH=/{{oils_install_path}}/bin:$PATH ./configure --prefix={{oils_install_path}} --sysconfdir={{oils_install_path}}/conf --with-websockets-port={{osrf_websocket_port}}"
+    chdir: '{{eg_local}}'
+- name: Run make
+  shell:
+    cmd: make
+    chdir: '{{eg_local}}'
+- name: Run make install
+  shell:
+    cmd: make install
+    chdir: '{{eg_local}}'
+- name: Change ownership 
+  shell:
+    cmd: "chown -R {{oils_user}}:{{oils_user}} {{oils_install_path}}"
+- name: ldconfig
+  shell: ldconfig
+- name: Download Dojo Toolkit
+  shell:
+    cmd: wget '{{dojo_url}}'
+    chdir: '{{base_dir}}'
+  when: not use_eg_tarball|bool
+- name: Untar Dojo
+  shell:
+    cmd: "tar -C {{oils_install_path}}/var/web/js -xzf {{dojo_package}}"
+    chdir: '{{base_dir}}'
+  when: not use_eg_tarball|bool
+- name: Copy Dojo files
+  shell: "cp -r {{oils_install_path}}/var/web/js/dojo-release-{{dojo_version}}/* {{oils_install_path}}/var/web/js/dojo"
+  when: not use_eg_tarball|bool
+- name: Change ownership of "{{oils_install_path}}" to "{{oils_user}}"
+  include_tasks: utilities/set_opensrf_owner.yml
+- name: Restart redis (just to make sure things are clean)
+  systemd:
+    name: redis
+    state: restarted
+- name: Re-ingest redis accounts
+  shell: "redis-cli < {{oils_install_path}}/conf/redis-accounts.txt"
