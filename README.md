@@ -38,6 +38,7 @@ Services can be selectively enabled or skipped using variables defined in `setti
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/your-repository.git
-cd your-repository
+git clone https://github.com/EmeraldData/ansible-evergreen.git
+cd ansible-evergreen
+
 
