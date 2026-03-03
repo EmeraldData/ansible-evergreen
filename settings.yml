@@ -70,12 +70,12 @@ load_concerto_enhanced: false
 
 #Redis setup. If set to 'true', the playbook will handle everything. If {{overwrite_config_files}} is set to false, you'll need to manually change the password values for the 'opensrf', 'gateway', and 'router' users in {{oils_install_path}}/conf/opensrf_conf.xml, as well as the {{oils_user}} password in {{base_dir}}/.srfsh.xml
 
-setup_redis: true
+setup_redis: false
 #----------
 
 #Sets up websocketd as service.
 
-setup_websocketd: false
+setup_websocketd: false #If this is set to 'false', this section will be skipped.
 websocketd_as_service: true
 websocketd_dir: /usr/local/bin/websocketd
 websocketd_version: 0.4.1
