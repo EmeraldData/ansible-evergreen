@@ -16,7 +16,6 @@
   shell: cp /tmp/websocketd /usr/local/bin
 - name: Getting services information
   service_facts:
-  register: service_state
   when: websocketd_as_service|bool
 - name: Checking if websocketd-osrf exists as a service
   set_fact:
