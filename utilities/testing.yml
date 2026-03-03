@@ -1,9 +1,0 @@
-- name: Testing tasks
-  hosts: prod_hosts
-  connection: local
-  become_method: sudo
-  vars_files:
-    - settings.yml
-  tasks:
-    - name: Test features
-      include_tasks: set_passwords.yml
